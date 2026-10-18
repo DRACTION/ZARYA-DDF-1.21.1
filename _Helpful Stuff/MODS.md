@@ -2609,4 +2609,4 @@ JavaScript-движок для KubeJS.
 
 ---
 
-<sub>Сгенерировано скриптом <code>Update MODS cards.ps1</code> · 2026-10-18. Правьте карточки в <code>mods/</code>, а не этот файл. Поиск и фильтр — на странице сборки <a href="../Z%40RYA.html#mods">Z@RYA.html</a>.</sub>
+<sub>Сгенерировано скриптом <code>Update mods.ps1</code> · 2026-10-18. Правьте карточки в <code>mods/</code>, а не этот файл. Поиск и фильтр — на странице сборки <a href="../Z%40RYA.html#mods">Z@RYA.html</a>.</sub>

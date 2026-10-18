@@ -9,7 +9,7 @@ git: '{{git}}'
 category: '{{category}}'
 ---
 <!--
-Шаблон карточки. Для нового мода: скопируйте в <modid>.md или запустите Update MODS cards.ps1.
+Шаблон карточки. Для нового мода: скопируйте в <modid>.md или запустите Update mods.ps1.
 name — название мода; modid — id из META-INF/neoforge.mods.toml;
 file, version — имя jar и версия (скрипт обновляет сам);
 modrinth, curseforge, git — ссылки (пустые скрипт дозаполняет через Modrinth).

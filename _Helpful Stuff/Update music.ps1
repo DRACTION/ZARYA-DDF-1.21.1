@@ -1,4 +1,4 @@
-﻿# Музыка Music Triggers: список файлов с MD5 (MusicTriggers\songs\MUSICLIST.md), сводка _Helpful Stuff\MUSIC.md, в конце — Update site.ps1 (Z@RYA.html)
+﻿# Музыка Music Triggers: список файлов с MD5 (MusicTriggers\songs\MUSICLIST.md), сводка _Helpful Stuff\MUSIC.md, в конце — Update README and site.ps1 (NFO-шапка README.md и Z@RYA.html) (Z@RYA.html)
 # Пути считаются от папки скрипта: корень инстанса = родитель папки скрипта.
 # Папка songs — папка данных Music Triggers (на неё ссылается config), её имя не меняется.
 param([switch]$NoSite, [switch]$NoReadme)
@@ -110,13 +110,10 @@ if ($M.parsed -and $trigs.Count) {
   [void]$sb.Append("По документации и исходникам Music Triggers 7.0.4. Время указывается в тиках: 20 тиков = 1 секунда.`n`n")
   [void]$sb.Append("$(P-Legend $ordK)`n`n**Параметры треков** (<code>[songs.*]</code>):`n`n$(P-Legend $usedS)`n`n</details>`n`n</blockquote>`n`n</details>`n`n")
 }
-[void]$sb.Append("---`n`n<sub>Сгенерировано скриптом <code>Update MD5 music.ps1</code> · $(Get-Date -Format 'yyyy-MM-dd'). Длительность посчитана по самим файлам. Поиск и фильтр — на странице сборки <a href=`"../Z%40RYA.html#music`">Z@RYA.html</a>.</sub>`n")
+[void]$sb.Append("---`n`n<sub>Сгенерировано скриптом <code>Update music.ps1</code> · $(Get-Date -Format 'yyyy-MM-dd'). Длительность посчитана по самим файлам. Поиск и фильтр — на странице сборки <a href=`"../Z%40RYA.html#music`">Z@RYA.html</a>.</sub>`n")
 $musicMd = Join-Path $PSScriptRoot 'MUSIC.md'
 [IO.File]::WriteAllText($musicMd, $sb.ToString(), $enc)
 Write-Host "Обновлён: $musicMd (треков: $($tracks.Count), групп: $($glist.Count), $(Format-Hms $total))"
 
-# README.md: NFO-шапка (число ресурспаков/треков, длительность музыки)
-if (-not $NoReadme) { & (Join-Path $PSScriptRoot 'Update README header.ps1') -NoSite }
-
-# Страница сборки Z@RYA.html
-if (-not $NoSite) { & (Join-Path $PSScriptRoot 'Update site.ps1') }
+# --- README.md (NFO-шапка) и страница сборки Z@RYA.html — Update README and site.ps1 ---
+if (-not ($NoReadme -and $NoSite)) { & (Join-Path $PSScriptRoot 'Update README and site.ps1') -NoReadme:$NoReadme -NoSite:$NoSite }

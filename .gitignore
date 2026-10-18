@@ -48,6 +48,9 @@
 /minecraft/config/**/*.bak
 /minecraft/config/**/*.old
 
+# --- журнал установки модов (соответствия старых модов) — только локально ---
+/_Helpful Stuff/install-log*.json
+
 # --- личные данные / настройки конкретного игрока ---
 /minecraft/optionsshaders.txt
 /minecraft/servers.dat

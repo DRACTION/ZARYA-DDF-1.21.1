@@ -1,4 +1,4 @@
-﻿# Ресурспаки: MD5 (minecraft\resourcepacks\RESOURCEPACKLIST.md), карточки _Helpful Stuff\resourcepacks\*.md, сводка _Helpful Stuff\RESOURCEPACKS.md, в конце — Update site.ps1
+﻿# Ресурспаки: MD5 (minecraft\resourcepacks\RESOURCEPACKLIST.md), карточки _Helpful Stuff\resourcepacks\*.md, сводка _Helpful Stuff\RESOURCEPACKS.md, в конце — Update README and site.ps1 (NFO-шапка README.md и Z@RYA.html)
 # Работает из любой текущей папки: пути считаются от расположения скрипта (корень инстанса = папка выше).
 param([switch]$NoNet, [switch]$NoSite, [switch]$NoReadme)
 $root = Split-Path -Parent $PSScriptRoot
@@ -167,13 +167,10 @@ foreach ($g in $groupsRp) {
   }
   [void]$sb.Append("`n</blockquote>`n`n</details>`n`n")
 }
-[void]$sb.Append("---`n`n<sub>Сгенерировано скриптом <code>Update MD5 resourcepacks.ps1</code> · $(Get-Date -Format 'yyyy-MM-dd'). Правьте карточки в <code>resourcepacks/</code>, а не этот файл. Поиск — на странице сборки <a href=`"../Z%40RYA.html#packs`">Z@RYA.html</a>.</sub>`n")
+[void]$sb.Append("---`n`n<sub>Сгенерировано скриптом <code>Update resourcepacks.ps1</code> · $(Get-Date -Format 'yyyy-MM-dd'). Правьте карточки в <code>resourcepacks/</code>, а не этот файл. Поиск — на странице сборки <a href=`"../Z%40RYA.html#packs`">Z@RYA.html</a>.</sub>`n")
 $rpMd = Join-Path $PSScriptRoot 'RESOURCEPACKS.md'
 [IO.File]::WriteAllText($rpMd, $sb.ToString(), $enc)
 Write-Host "Обновлён: $rpMd"
 
-# README.md: NFO-шапка (число ресурспаков/треков, длительность музыки)
-if (-not $NoReadme) { & (Join-Path $PSScriptRoot 'Update README header.ps1') -NoSite }
-
-# Страница сборки Z@RYA.html
-if (-not $NoSite) { & (Join-Path $PSScriptRoot 'Update site.ps1') }
+# --- README.md (NFO-шапка) и страница сборки Z@RYA.html — Update README and site.ps1 ---
+if (-not ($NoReadme -and $NoSite)) { & (Join-Path $PSScriptRoot 'Update README and site.ps1') -NoReadme:$NoReadme -NoSite:$NoSite }

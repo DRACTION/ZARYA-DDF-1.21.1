@@ -226,4 +226,4 @@
 
 ---
 
-<sub>Сгенерировано скриптом <code>Update MD5 resourcepacks.ps1</code> · 2026-10-18. Правьте карточки в <code>resourcepacks/</code>, а не этот файл. Поиск — на странице сборки <a href="../Z%40RYA.html#packs">Z@RYA.html</a>.</sub>
+<sub>Сгенерировано скриптом <code>Update resourcepacks.ps1</code> · 2026-10-18. Правьте карточки в <code>resourcepacks/</code>, а не этот файл. Поиск — на странице сборки <a href="../Z%40RYA.html#packs">Z@RYA.html</a>.</sub>

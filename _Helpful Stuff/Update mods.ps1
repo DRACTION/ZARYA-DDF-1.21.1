@@ -1,12 +1,29 @@
-﻿# Генерация карточек модов (_Helpful Stuff\mods\*.md) и сводной таблицы _Helpful Stuff\MODS.md; в конце — Update site.ps1 (Z@RYA.html)
-# Пути считаются от папки скрипта: корень инстанса = родитель папки скрипта.
-param([string]$InstallLog = 'U:\Minecraft\_Z@RYA DDF 1.21.1\install-log.json', [switch]$NoNet,
-  [string]$ModsDir, [string]$CardsDir, [string]$ModsMd, [switch]$NoReadme)
+﻿# Моды: MD5 (minecraft\mods\MODLIST.md), карточки _Helpful Stuff\mods\*.md, сводка _Helpful Stuff\MODS.md, в конце — Update README and site.ps1 (NFO-шапка README.md и Z@RYA.html)
+# Работает из любой текущей папки: пути считаются от расположения скрипта (корень инстанса = папка выше). Абсолютных путей нет.
+# -NoNet — без Modrinth; -NoSite — без пересборки Z@RYA.html; -NoReadme — без обновления шапки README.md.
+# -InstallLog — необязательный журнал установки модов (install-log.json: sha1/файл -> ссылки, версия, id проекта Modrinth).
+#   Только дозаполняет пустые поля карточек. По умолчанию ищется _Helpful Stuff\install-log.json (файл в .gitignore: в нём соответствия старых модов, в репозиторий не попадает);
+#   относительный путь считается от корня инстанса. Без журнала скрипт работает так же (версии берутся из jar, карточек или имени файла).
+param([switch]$NoNet, [switch]$NoSite, [switch]$NoReadme, [string]$InstallLog,
+  [string]$ModsDir, [string]$CardsDir, [string]$ModsMd)
+$root = Split-Path -Parent $PSScriptRoot
+$modsDir = if ($ModsDir) { $ModsDir } else { Join-Path $root 'minecraft\mods' }
+if (-not (Test-Path -LiteralPath $modsDir)) { Write-Error "Папка не найдена: $modsDir"; exit 1 }
+$output = "## Список модов и ХЭШ-суммы`n"
+$output += "`n"
+foreach($f in (Get-ChildItem -LiteralPath $modsDir -File | Sort-Object Name)){
+	if($f.Extension -eq ".jar"){
+		$output += "    Имя файла: " + $f.Name + "`n"
+		$output += "    MD5: " + (Get-FileHash -LiteralPath $f.FullName -Algorithm MD5).Hash + "`n"
+		$output +=  "---`n"
+}}
+Out-File -FilePath (Join-Path $modsDir 'MODLIST.md') -InputObject $output -Encoding utf8
+Write-Host "Обновлён: $(Join-Path $modsDir 'MODLIST.md')"
+
+# --- Карточки модов: _Helpful Stuff\mods\*.md (по одной на jar) ---
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $enc = New-Object Text.UTF8Encoding($false)
-$root = Split-Path -Parent $PSScriptRoot
-$modsDir = if ($ModsDir) { $ModsDir } else { Join-Path $root 'minecraft\mods' }
 $cardsDir = if ($CardsDir) { $CardsDir } else { Join-Path $PSScriptRoot 'mods' }
 $modsMdPath = if ($ModsMd) { $ModsMd } else { Join-Path $PSScriptRoot 'MODS.md' }
 # Шаблон карточки: всегда из _Helpful Stuff\mods\_TEMPLATE.md
@@ -40,7 +57,7 @@ function New-Stub($vals) {
   $d
 }
 # Чистая версия: только номер версии мода, без версии Minecraft, лоадера и названия.
-# Источники по приоритету: neoforge.mods.toml (если не ${...}), версия из install-log (Modrinth), имя файла.
+# Источники по приоритету: neoforge.mods.toml (если не ${...}), версия из install-log (Modrinth) или уже записанная в карточке, имя файла.
 function Clean-Version([string]$s) {
   if (-not $s -or $s -like '*${*') { return '' }
   $s = $s -replace '(?i)\.jar$', ''
@@ -82,9 +99,12 @@ function Jar-Meta($jarPath) {
   $r
 }
 
-# install-log (необязателен)
+# install-log (необязателен): -InstallLog или _Helpful Stuff\install-log.json; относительный путь — от корня инстанса
 $log = @{}
-if ($InstallLog -and (Test-Path -LiteralPath $InstallLog)) {
+if (-not $InstallLog) { $InstallLog = Join-Path $PSScriptRoot 'install-log.json' }
+elseif (-not [IO.Path]::IsPathRooted($InstallLog)) { $InstallLog = Join-Path $root $InstallLog }
+if (Test-Path -LiteralPath $InstallLog) {
+  Write-Host "install-log: $InstallLog"
   $jl = [IO.File]::ReadAllText($InstallLog, $enc) | ConvertFrom-Json
   foreach ($m in $jl.mods) { if ($m.sha1) { $log[$m.sha1] = $m }; if ($m.file) { $log['f:' + $m.file] = $m } }
 }
@@ -120,7 +140,7 @@ foreach ($j in $jars) {
   foreach ($f in $fields) { if ($null -eq $fm[$f]) { $fm[$f] = '' } }
   $fm.file = $j.Name
   if (-not $fm.category) { $fm.category = $noCategory }
-  $ver = Get-Version $meta.version $(if ($L) { $L.ver } else { '' }) $j.Name; if ($ver) { $fm.version = $ver }
+  $ver = Get-Version $meta.version $(if ($L -and $L.ver) { $L.ver } else { $fm.version }) $j.Name; if ($ver) { $fm.version = $ver }
   if (-not $fm.modid) { $fm.modid = $meta.modid }
   if (-not $fm.name) { $fm.name = if ($meta.name -and $meta.name -notlike '*${*') { $meta.name } elseif ($L -and $L.name) { $L.name } else { $j.BaseName } }
   if ($L) {
@@ -199,15 +219,12 @@ foreach ($cat in $catOrder) {
   }
   [void]$sb.Append("`n</blockquote>`n`n</details>`n`n")
 }
-[void]$sb.Append("---`n`n<sub>Сгенерировано скриптом <code>Update MODS cards.ps1</code> · $(Get-Date -Format 'yyyy-MM-dd'). Правьте карточки в <code>mods/</code>, а не этот файл. Поиск и фильтр — на странице сборки <a href=`"../Z%40RYA.html#mods`">Z@RYA.html</a>.</sub>`n")
+[void]$sb.Append("---`n`n<sub>Сгенерировано скриптом <code>Update mods.ps1</code> · $(Get-Date -Format 'yyyy-MM-dd'). Правьте карточки в <code>mods/</code>, а не этот файл. Поиск и фильтр — на странице сборки <a href=`"../Z%40RYA.html#mods`">Z@RYA.html</a>.</sub>`n")
 [IO.File]::WriteAllText($modsMdPath, $sb.ToString(), $enc)
 
 $stale = (Get-Cards | Where-Object { $used[$_.BaseName] -ne 1 }).Name
 Write-Host "Карточек: $($items.Count), новых: $new, jar: $($jars.Count)"
 if ($stale) { Write-Host "Карточки без jar: $($stale -join ', ')" }
 
-# --- README.md: NFO-шапка (версии, число модов/ресурспаков/треков) — Update README header.ps1 ---
-if (-not $NoReadme) { & (Join-Path $PSScriptRoot 'Update README header.ps1') -NoSite }
-
-# --- Страница сборки Z@RYA.html (вкладка «Моды» и остальное) ---
-& (Join-Path $PSScriptRoot 'Update site.ps1')
+# --- README.md (NFO-шапка) и страница сборки Z@RYA.html — Update README and site.ps1 ---
+if (-not ($NoReadme -and $NoSite)) { & (Join-Path $PSScriptRoot 'Update README and site.ps1') -NoReadme:$NoReadme -NoSite:$NoSite }

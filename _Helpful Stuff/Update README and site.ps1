@@ -1,13 +1,100 @@
-﻿# Страница сборки Z@RYA.html в корне инстанса: один офлайн-файл (без внешних CSS/JS/шрифтов) + index.html с переадресацией на неё (GitHub Pages).
-# Вкладки: Главная / Установка / Помощь (тексты из README.md), Моды (карточки mods/*.md), Ресурспаки, Музыка.
-# Вызывается из Update MODS cards.ps1, Update MD5 resourcepacks.ps1, Update MD5 music.ps1 и Update README header.ps1; можно запускать отдельно.
+﻿# README.md (NFO-шапка) и страница сборки Z@RYA.html + index.html — одним скриптом.
+# 1) Шапка README.md: ASCII-блок ```text между <!-- ZARYA-HEADER:BEGIN --> и <!-- ZARYA-HEADER:END -->:
+#    версия сборки, Minecraft, NeoForge, Java, число модов / ресурспаков / треков и длительность музыки, скрипты, дата.
+#    Источники: instance.cfg и mmc-pack.json (Get-PackInfo), мета лаунчера (Java), minecraft\mods, minecraft\resourcepacks, Music Triggers (Get-MusicData).
+#    Меняются только строки-поля внутри рамки; ширина и выравнивание сохраняются; файл пишется, только если что-то изменилось.
+#    Кодировка (BOM или без) и переводы строк (CRLF/LF) сохраняются.
+# 2) Z@RYA.html в корне инстанса: один офлайн-файл (без внешних CSS/JS/шрифтов) + index.html с переадресацией на неё (GitHub Pages).
+#    Вкладки: Главная / Установка / Помощь (тексты из README.md), Моды (карточки mods/*.md), Ресурспаки, Музыка.
+# Вызывается из Update mods.ps1, Update resourcepacks.ps1, Update music.ps1; можно запускать отдельно.
+# -NoReadme — не трогать README.md; -NoSite — не собирать Z@RYA.html/index.html; -OutFile — собрать страницу в другой файл (без index.html).
 # Пути считаются от папки скрипта: корень инстанса = родитель папки скрипта.
-param([string]$OutFile)
+param([switch]$NoReadme, [switch]$NoSite, [string]$OutFile)
 $ErrorActionPreference = 'Stop'
-Add-Type -AssemblyName System.IO.Compression.FileSystem
 . (Join-Path $PSScriptRoot '_common.ps1')
-$enc = New-Object Text.UTF8Encoding($false)
 $root = Split-Path -Parent $PSScriptRoot
+# Музыка нужна и шапке, и странице: длительности читаются из файлов один раз
+$musicData = Get-MusicData $root
+
+# ================= 1. NFO-шапка README.md =================
+function Update-ReadmeHeader([string]$root, $music) {
+  $readmePath = Join-Path $root 'README.md'
+  if (-not (Test-Path -LiteralPath $readmePath)) { Write-Warning ("README.md: " + "Нет файла: $readmePath"); return }
+  $BEGIN = '<!-- ZARYA-HEADER:BEGIN -->'; $END = '<!-- ZARYA-HEADER:END -->'
+
+  # --- данные ---
+  $pi = Get-PackInfo $root
+  $packName = ($pi.name -replace '\s*\(\d+(\.\d+)+\)', '' -replace '\s*\br\d+\.\d+\.\d+\b', '').Trim(); if (-not $packName) { $packName = 'Z@RYA Deep Dark Fantasies' }
+  # Java: compatibleJavaMajors из меты Minecraft в лаунчере (<лаунчер>\meta\net.minecraft\<версия>.json); нет меты — по версии Minecraft
+  $java = ''
+  $metaMc = Join-Path (Split-Path -Parent (Split-Path -Parent $root)) "meta\net.minecraft\$($pi.mc).json"
+  if (Test-Path -LiteralPath $metaMc) { try { $j = @((Get-Content -LiteralPath $metaMc -Raw -Encoding UTF8 | ConvertFrom-Json).compatibleJavaMajors); if ($j.Count) { $java = [string]($j | Measure-Object -Maximum).Maximum } } catch { } }
+  if (-not $java) { $java = if ([version]$pi.mc -ge [version]'1.20.5') { '21' } elseif ([version]$pi.mc -ge [version]'1.18') { '17' } else { '8' } }
+  $modsDir = Join-Path $root 'minecraft\mods'
+  $jars = @(if (Test-Path -LiteralPath $modsDir) { Get-ChildItem -LiteralPath $modsDir -File -Filter *.jar })
+  $rpDir = Join-Path $root 'minecraft\resourcepacks'
+  $rpCount = @(if (Test-Path -LiteralPath $rpDir) { Get-ChildItem -LiteralPath $rpDir | Where-Object { $_.PSIsContainer -or $_.Extension -eq '.zip' } }).Count
+  $tracks = @($music.tracks); $sec = 0.0; foreach ($t in $tracks) { if ($null -ne $t.dur -and "$($t.dur)" -ne '') { $sec += [double]$t.dur } }
+  $s = [int][Math]::Round($sec); $durTxt = '{0}h {1:00}m' -f [Math]::Floor($s / 3600), [Math]::Floor(($s % 3600) / 60)
+  $scripts = @(@('kubejs', 'KubeJS'), @('lootjs', 'LootJS'), @('morejs', 'MoreJS') | Where-Object { $p = $_[0]; @($jars | Where-Object { $_.Name -match "^(?i)$p[-_ ]" }).Count } | ForEach-Object { $_[1] }) -join ' + '
+  if (-not $scripts) { $scripts = '-' }
+  $fields = [ordered]@{
+    'PACK'      = $packName
+    'VERSION'   = $(if ($pi.version) { $pi.version } else { '-' })
+    'MINECRAFT' = $pi.mc
+    'LOADER'    = $(if ($pi.neo) { "NeoForge $($pi.neo)" } else { '-' })
+    'JAVA'      = $java
+    'MODS'      = "$($jars.Count)"
+    'RESOURCES' = "$rpCount resource packs"
+    'MUSIC'     = "$($tracks.Count) tracks, $durTxt"
+    'SCRIPTS'   = $scripts
+    'DATE'      = (Get-Date -Format 'yyyy-MM')
+  }
+
+  # --- README ---
+  $bytes = [IO.File]::ReadAllBytes($readmePath)
+  $bom = $bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF
+  $enc = New-Object Text.UTF8Encoding($bom)
+  $orig = [IO.File]::ReadAllText($readmePath, $enc)
+  $nl = if ($orig.Contains("`r`n")) { "`r`n" } else { "`n" }
+  $txt = $orig -replace "`r`n", "`n"
+  if (-not $txt.Contains($BEGIN)) {
+    $m = [regex]::Match($txt, '(?s)```text\n.*?\n```')
+    if (-not $m.Success) { Write-Warning ("README.md: " + 'В README.md нет блока ```text с шапкой'); return }
+    $txt = $txt.Substring(0, $m.Index) + "$BEGIN`n" + $m.Value + "`n$END" + $txt.Substring($m.Index + $m.Length)
+  }
+  $bi = $txt.IndexOf($BEGIN); $ei = $txt.IndexOf($END, $bi)
+  if ($ei -lt 0) { Write-Warning ("README.md: " + "Нет маркера $END"); return }
+  $block = $txt.Substring($bi, $ei - $bi)
+  $lines = [Collections.Generic.List[string]]($block -split "`n")
+  # Строки-поля рамки: <отступ>+<ключ справа> : <значение>+ ; строки-разделители: <отступ>+--- - - ... +
+  $rowRe = '^(\s*\+)(\s*)([A-Z][A-Z .]*?) : (.*?)\+$'
+  $idx = @(for ($k = 0; $k -lt $lines.Count; $k++) { if ($lines[$k] -match $rowRe) { $k } })
+  if (-not $idx.Count) { Write-Warning ("README.md: " + 'В шапке нет строк вида «KEY : value»'); return }
+  $first = $lines[$idx[0]]; [void]($first -match $rowRe)
+  $lead = $Matches[1]; $keyW = $Matches[2].Length + $Matches[3].Length; $valW = $Matches[4].Length
+  $sep = $null; for ($k = $idx[0] + 1; $k -lt $idx[-1]; $k++) { if ($lines[$k] -notmatch $rowRe -and $lines[$k].StartsWith($lead)) { $sep = $lines[$k]; break } }
+  if (-not $sep) { $sep = $lead + '-' * ($keyW + 3 + $valW) + '+' }
+  $rows = New-Object System.Collections.Generic.List[string]
+  foreach ($key in $fields.Keys) {
+    $v = ([string]$fields[$key] -replace '[^\x20-\x7E]', '?').Trim()
+    if ($v.Length -gt $valW - 1) { Write-Warning "README-шапка: значение $key обрезано до $($valW - 1) символов"; $v = $v.Substring(0, $valW - 1) }
+    if ($key.Length -gt $keyW) { Write-Warning "README-шапка: ключ $key длиннее $keyW"; continue }
+    if ($rows.Count) { $rows.Add($sep) }
+    $rows.Add($lead + $key.PadLeft($keyW) + ' : ' + $v.PadRight($valW) + '+')
+  }
+  $lines.RemoveRange($idx[0], $idx[-1] - $idx[0] + 1)
+  $lines.InsertRange($idx[0], $rows)
+  $txt = $txt.Substring(0, $bi) + ($lines -join "`n") + $txt.Substring($ei)
+  $new = $txt -replace "`n", $nl
+  if ($new -cne $orig) { [IO.File]::WriteAllText($readmePath, $new, $enc); Write-Host 'README.md: шапка обновлена' } else { Write-Host 'README.md: шапка без изменений' }
+}
+if (-not $NoReadme) { Update-ReadmeHeader $root $musicData }
+if ($NoSite) { return }
+
+# ================= 2. Страница сборки Z@RYA.html =================
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$enc = New-Object Text.UTF8Encoding($false)
 $outPath = if ($OutFile) { $OutFile } else { Join-Path $root 'Z@RYA.html' }
 $cardsDir = Join-Path $PSScriptRoot 'mods'
 $modsDir = Join-Path $root 'minecraft\mods'
@@ -99,8 +186,8 @@ $cats = @(Get-CategoryOrder @($mods | ForEach-Object { $_.category }) | ForEach-
 $rpData = Get-ResourcePacks $root $rpCardsDir; $packs = @($rpData.packs); $packsOrder = $rpData.order
 
 
-# --- Музыка: файлы и события Music Triggers — Get-MusicData в _common.ps1 ---
-$music = Get-MusicData $root
+# --- Музыка: файлы и события Music Triggers — Get-MusicData в _common.ps1 (посчитано один раз в начале скрипта) ---
+$music = $musicData
 
 # --- Сборка страницы ---
 $data = [ordered]@{ pack = $pack; cats = $cats; mods = $mods; packs = $packs; packsOrder = $packsOrder; music = $music; readme = $readme }
@@ -528,7 +615,7 @@ html.home:not(.day) .wrap{padding-bottom:calc(var(--fh) + 8px)}
   </table></div>
   <div class="ov" id="mtov" aria-hidden="true"><div class="ovp" role="dialog" aria-label="Как настроены события"><div class="ovh"><b>Как настроены события <span>(main.toml)</span></b><button class="ovx" id="mtovx" type="button" data-tip="Закрыть (Esc)">×</button></div><div class="ovb" id="mtovb"></div></div></div></div>
 </section>
-<footer id="foot"><span>Сгенерировано скриптом <code>_Helpful Stuff/Update site.ps1</code></span></footer>
+<footer id="foot"><span>Сгенерировано скриптом <code>_Helpful Stuff/Update README and site.ps1</code></span></footer>
 </div>
 <script type="application/json" id="data">__DATA__</script>
 <script>
