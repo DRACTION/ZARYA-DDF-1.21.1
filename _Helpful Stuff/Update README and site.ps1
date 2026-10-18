@@ -1,7 +1,7 @@
 ﻿# README.md (NFO-шапка) и страница сборки Z@RYA.html + index.html — одним скриптом.
 # 1) Шапка README.md: ASCII-блок ```text между <!-- ZARYA-HEADER:BEGIN --> и <!-- ZARYA-HEADER:END -->:
-#    версия сборки, Minecraft, NeoForge, Java, число модов / ресурспаков / треков и длительность музыки, скрипты, дата.
-#    Источники: instance.cfg и mmc-pack.json (Get-PackInfo), мета лаунчера (Java), minecraft\mods, minecraft\resourcepacks, Music Triggers (Get-MusicData).
+#    название и версия сборки, Minecraft, NeoForge, число модов, скрипты (KubeJS/LootJS/MoreJS), дата.
+#    Источники: instance.cfg и mmc-pack.json (Get-PackInfo), minecraft\mods.
 #    Меняются только строки-поля внутри рамки; ширина и выравнивание сохраняются; файл пишется, только если что-то изменилось.
 #    Кодировка (BOM или без) и переводы строк (CRLF/LF) сохраняются.
 # 2) Z@RYA.html в корне инстанса: один офлайн-файл (без внешних CSS/JS/шрифтов) + index.html с переадресацией на неё (GitHub Pages).
@@ -13,11 +13,9 @@ param([switch]$NoReadme, [switch]$NoSite, [string]$OutFile)
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot '_common.ps1')
 $root = Split-Path -Parent $PSScriptRoot
-# Музыка нужна и шапке, и странице: длительности читаются из файлов один раз
-$musicData = Get-MusicData $root
 
 # ================= 1. NFO-шапка README.md =================
-function Update-ReadmeHeader([string]$root, $music) {
+function Update-ReadmeHeader([string]$root) {
   $readmePath = Join-Path $root 'README.md'
   if (-not (Test-Path -LiteralPath $readmePath)) { Write-Warning ("README.md: " + "Нет файла: $readmePath"); return }
   $BEGIN = '<!-- ZARYA-HEADER:BEGIN -->'; $END = '<!-- ZARYA-HEADER:END -->'
@@ -25,17 +23,8 @@ function Update-ReadmeHeader([string]$root, $music) {
   # --- данные ---
   $pi = Get-PackInfo $root
   $packName = ($pi.name -replace '\s*\(\d+(\.\d+)+\)', '' -replace '\s*\br\d+\.\d+\.\d+\b', '').Trim(); if (-not $packName) { $packName = 'Z@RYA Deep Dark Fantasies' }
-  # Java: compatibleJavaMajors из меты Minecraft в лаунчере (<лаунчер>\meta\net.minecraft\<версия>.json); нет меты — по версии Minecraft
-  $java = ''
-  $metaMc = Join-Path (Split-Path -Parent (Split-Path -Parent $root)) "meta\net.minecraft\$($pi.mc).json"
-  if (Test-Path -LiteralPath $metaMc) { try { $j = @((Get-Content -LiteralPath $metaMc -Raw -Encoding UTF8 | ConvertFrom-Json).compatibleJavaMajors); if ($j.Count) { $java = [string]($j | Measure-Object -Maximum).Maximum } } catch { } }
-  if (-not $java) { $java = if ([version]$pi.mc -ge [version]'1.20.5') { '21' } elseif ([version]$pi.mc -ge [version]'1.18') { '17' } else { '8' } }
   $modsDir = Join-Path $root 'minecraft\mods'
   $jars = @(if (Test-Path -LiteralPath $modsDir) { Get-ChildItem -LiteralPath $modsDir -File -Filter *.jar })
-  $rpDir = Join-Path $root 'minecraft\resourcepacks'
-  $rpCount = @(if (Test-Path -LiteralPath $rpDir) { Get-ChildItem -LiteralPath $rpDir | Where-Object { $_.PSIsContainer -or $_.Extension -eq '.zip' } }).Count
-  $tracks = @($music.tracks); $sec = 0.0; foreach ($t in $tracks) { if ($null -ne $t.dur -and "$($t.dur)" -ne '') { $sec += [double]$t.dur } }
-  $s = [int][Math]::Round($sec); $durTxt = '{0}h {1:00}m' -f [Math]::Floor($s / 3600), [Math]::Floor(($s % 3600) / 60)
   $scripts = @(@('kubejs', 'KubeJS'), @('lootjs', 'LootJS'), @('morejs', 'MoreJS') | Where-Object { $p = $_[0]; @($jars | Where-Object { $_.Name -match "^(?i)$p[-_ ]" }).Count } | ForEach-Object { $_[1] }) -join ' + '
   if (-not $scripts) { $scripts = '-' }
   $fields = [ordered]@{
@@ -43,10 +32,7 @@ function Update-ReadmeHeader([string]$root, $music) {
     'VERSION'   = $(if ($pi.version) { $pi.version } else { '-' })
     'MINECRAFT' = $pi.mc
     'LOADER'    = $(if ($pi.neo) { "NeoForge $($pi.neo)" } else { '-' })
-    'JAVA'      = $java
     'MODS'      = "$($jars.Count)"
-    'RESOURCES' = "$rpCount resource packs"
-    'MUSIC'     = "$($tracks.Count) tracks, $durTxt"
     'SCRIPTS'   = $scripts
     'DATE'      = (Get-Date -Format 'yyyy-MM')
   }
@@ -89,7 +75,7 @@ function Update-ReadmeHeader([string]$root, $music) {
   $new = $txt -replace "`n", $nl
   if ($new -cne $orig) { [IO.File]::WriteAllText($readmePath, $new, $enc); Write-Host 'README.md: шапка обновлена' } else { Write-Host 'README.md: шапка без изменений' }
 }
-if (-not $NoReadme) { Update-ReadmeHeader $root $musicData }
+if (-not $NoReadme) { Update-ReadmeHeader $root }
 if ($NoSite) { return }
 
 # ================= 2. Страница сборки Z@RYA.html =================
@@ -186,8 +172,8 @@ $cats = @(Get-CategoryOrder @($mods | ForEach-Object { $_.category }) | ForEach-
 $rpData = Get-ResourcePacks $root $rpCardsDir; $packs = @($rpData.packs); $packsOrder = $rpData.order
 
 
-# --- Музыка: файлы и события Music Triggers — Get-MusicData в _common.ps1 (посчитано один раз в начале скрипта) ---
-$music = $musicData
+# --- Музыка: файлы и события Music Triggers — Get-MusicData в _common.ps1 ---
+$music = Get-MusicData $root
 
 # --- Сборка страницы ---
 $data = [ordered]@{ pack = $pack; cats = $cats; mods = $mods; packs = $packs; packsOrder = $packsOrder; music = $music; readme = $readme }
