@@ -1,0 +1,74 @@
+# Z@RYA Deep Dark Fantasies (1.21.1) — что попадает в git / GitHub Pages.
+# Отслеживаются текстовые исходники: README.md, Z@RYA.html, index.html, instance.cfg, mmc-pack.json,
+# _Helpful Stuff (скрипты, MD-списки, карточки модов и ресурспаков), minecraft/kubejs, minecraft/config,
+# minecraft/defaultconfigs, свои ресурспаки-папки и списки MODLIST/RESOURCEPACKLIST/MUSICLIST.md.
+# Бинарники (моды, архивы, музыка, кадры анимации) и рантайм игры/лаунчера — не отслеживаются.
+
+# --- бинарники сборки (берите с архива релиза) ---
+*.jar
+*.jar.disabled
+*.disabled
+*.zip
+*.7z
+*.rar
+*.ogg
+*.mp3
+*.wav
+*.flac
+# маленькие звуки, сделанные для сборки в KubeJS, — маленькие по размеру оставляем
+!/minecraft/kubejs/assets/*/sounds/**/*.ogg
+# кадры анимации главного меню (~100 МБ jpg) - берите с архива релиза
+/minecraft/kubejs/assets/mc_cave_animation_*/
+
+# --- рантайм игры ---
+/minecraft/logs/
+/minecraft/crash-reports/
+/minecraft/saves/
+/minecraft/screenshots/
+/minecraft/backups/
+/minecraft/schematics/
+/minecraft/downloads/
+/minecraft/local/
+/minecraft/.cache/
+/minecraft/.fabric/
+/minecraft/.mixin.out/
+/minecraft/.neoforge/
+/minecraft/journeymap/
+/minecraft/xaero/
+/minecraft/XaeroWaypoints/
+/minecraft/XaeroWorldMap/
+/minecraft/moddata/
+/minecraft/kubejs/exported/
+/minecraft/kubejs/.probe/
+/minecraft/kubejs/probe/
+/minecraft/coremods/
+/minecraft/shaderpacks/
+/minecraft/texturepacks/
+/minecraft/config/**/cache/
+/minecraft/config/**/*.bak
+/minecraft/config/**/*.old
+
+# --- личные данные / настройки конкретного игрока ---
+/minecraft/optionsshaders.txt
+/minecraft/servers.dat
+/minecraft/servers.dat_old
+/minecraft/usercache.json
+/minecraft/usernamecache.json
+/minecraft/realms_persistence.json
+/minecraft/command_history.txt
+/minecraft/hotbar.nbt
+/minecraft/patchouli_data.json
+/minecraft/*.log
+accounts.json
+*.token
+.env
+
+# --- мусор ---
+*.log
+*.tmp
+*.temp
+*.bak
+*~
+Thumbs.db
+desktop.ini
+.DS_Store
