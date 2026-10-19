@@ -339,6 +339,9 @@
     Имя файла: findme-3.3.3-neoforge.jar
     MD5: 07578318022A9EE45053CD40281D3383
 ---
+    Имя файла: flib-1.21.1-0.2.9.jar
+    MD5: F6BE18E125402560335923BE9AA1E00E
+---
     Имя файла: flickerfix-1.21.0.jar
     MD5: 9BE9E7DC975B27A1716FB5A9FFDC9F2A
 ---
@@ -414,9 +417,6 @@
     Имя файла: iChunUtil-1.21-NeoForge-1.0.3.jar
     MD5: 6C671ACF384A48CCA55C3AD2298989B9
 ---
-    Имя файла: idkfindaidea-1.0.0-forge-1.20.1.jar
-    MD5: 2F608BF637716BA13932EF213D3B1CDA
----
     Имя файла: ImmediatelyFast-NeoForge-1.6.15+1.21.1.jar
     MD5: 246E7A78710E73E070118A671B1D2D87
 ---
@@ -452,6 +452,9 @@
 ---
     Имя файла: iris-neoforge-1.8.12+mc1.21.1.jar
     MD5: 6C1122AA7C2B1A4F24831E394C5B513F
+---
+    Имя файла: irons_lib-1.21.1-2.2.0.jar
+    MD5: 27C9C2E03A3BBA49EFFA77D8266C987E
 ---
     Имя файла: irons_spellbooks-1.21.1-3.16.3.jar
     MD5: 7F1F4F079484DF172F3A47DB94682462
@@ -563,9 +566,6 @@
 ---
     Имя файла: moonlight-1.21.1-3.7.2-neoforge.jar
     MD5: 949D8D0A250830C5DA1470892953618D
----
-    Имя файла: Moonrise-NeoForge-0.1.0-beta.15+2eae1b1.jar
-    MD5: B7558975D61653B18AA3B731A889E477
 ---
     Имя файла: morejs-neoforge-1.21.1-0.16.0.jar
     MD5: E87BE3FF14ACF0F95DFF07155C3AAA01
@@ -687,6 +687,9 @@
     Имя файла: realmrpg_skeletons-1.1.0-neoforge-1.21.1.jar
     MD5: 367D640658D4306E2FF2539F72CBADFE
 ---
+    Имя файла: reeses-sodium-options-neoforge-2.2.4+mc1.21.1.jar
+    MD5: 577E9FF1C3A0B480F29AEC457D87FDC4
+---
     Имя файла: relics-1.21.1-0.10.7.8.jar
     MD5: 865071A0E3FC927381CFDAFEA9619A2E
 ---
@@ -743,9 +746,6 @@
 ---
     Имя файла: sodium-neoforge-0.8.13+mc1.21.1.jar
     MD5: C2BC7287841C29E25CE553BAAE1700A0
----
-    Имя файла: sodiumoptionsapi-neoforge-1.0.10-1.21.1.jar
-    MD5: 1411AF8DEFB5136119D3CF706D3D9CD8
 ---
     Имя файла: solcarrot-1.21.1-1.16.6.jar
     MD5: DF768D5560CCFB443A33FC6F73671E3B

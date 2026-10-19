@@ -2,7 +2,7 @@
 
 **Ресурспаков: 12** · Minecraft 1.21.1 · [GitHub](https://github.com/DRACTION/ZARYA-DDF-1.21.1)
 
-> Поиск — на странице сборки [Z@RYA.html](../Z%40RYA.html#packs) (скачайте и откройте в браузере, работает без интернета).
+> Поиск, порядок и карточки — на [странице сборки](https://draction.github.io/ZARYA-DDF-1.21.1/#packs) [(версия без интернета)](Z%40RYA.html#packs).
 > По алфавиту — `options.txt` ещё нет (порядок из игры появится после первого запуска).
 
 ## Список
@@ -226,4 +226,4 @@
 
 ---
 
-<sub>Сгенерировано скриптом <code>Update resourcepacks.ps1</code> · 2026-10-18. Правьте карточки в <code>resourcepacks/</code>, а не этот файл. Поиск — на странице сборки <a href="../Z%40RYA.html#packs">Z@RYA.html</a>.</sub>
+<sub>Сгенерировано скриптом <code>Update resourcepacks.ps1</code> · 2026-10-18. Правьте карточки в <code>resourcepacks/</code>, а не этот файл. Поиск — на странице сборки <a href="Z%40RYA.html#packs">Z@RYA.html</a>.</sub>

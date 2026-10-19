@@ -24,6 +24,10 @@ $categories = @(
   'Без категории'
 )
 $noCategory = 'Без категории'
+# Опубликованная страница сборки (GitHub Pages) и строка-ссылка для шапок MODS.md / MUSIC.md / RESOURCEPACKS.md:
+# онлайн-версия + локальная Z@RYA.html (лежит рядом с MD-файлами в _Helpful Stuff) на ту же вкладку.
+$siteUrl = 'https://draction.github.io/ZARYA-DDF-1.21.1/'
+function Site-Links([string]$tab) { "[странице сборки]($siteUrl#$tab) [(версия без интернета)](Z%40RYA.html#$tab)" }
 # Иконка и ASCII-якорь категории для MODS.md и Z@RYA.html (неизвестные категории: 🏷️ и cat-N)
 $categoryMeta = @{
   'Create и аддоны' = @('⚙️', 'create')

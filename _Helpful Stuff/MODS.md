@@ -2,7 +2,7 @@
 
 **Модов: 296** · Minecraft 1.21.1 · NeoForge 21.1.259 · [GitHub](https://github.com/DRACTION/ZARYA-DDF-1.21.1)
 
-> Поиск, фильтр по категориям и сортировка — на странице сборки [Z@RYA.html](../Z%40RYA.html#mods) (скачайте и откройте в браузере, работает без интернета).
+> Поиск, фильтр по категориям и сортировка — на [странице сборки](https://draction.github.io/ZARYA-DDF-1.21.1/#mods) [(версия без интернета)](Z%40RYA.html#mods).
 
 ## Категории
 
@@ -21,12 +21,12 @@
 | 🚂 | [Транспорт и перемещение](#transport) | 9 |
 | 🧱 | [Декор и строительство](#decor) | 14 |
 | 🖱️ | [Интерфейс и QoL](#ui) | 33 |
-| ✨ | [Графика и анимации](#graphics) | 13 |
+| ✨ | [Графика и анимации](#graphics) | 14 |
 | 🎵 | [Звук и музыка](#sound) | 6 |
-| 🚀 | [Оптимизация и исправления](#performance) | 23 |
+| 🚀 | [Оптимизация и исправления](#performance) | 22 |
 | 🛠️ | [Сервер, скрипты и утилиты](#server) | 14 |
-| 📚 | [Библиотеки и API](#libraries) | 50 |
-| 📦 | [Прочее](#misc) | 40 |
+| 📚 | [Библиотеки и API](#libraries) | 51 |
+| 📦 | [Прочее](#misc) | 39 |
 
 ## Список модов
 
@@ -1375,7 +1375,7 @@
 
 <a id="graphics"></a>
 <details>
-<summary><b>✨ Графика и анимации</b> (13)</summary>
+<summary><b>✨ Графика и анимации</b> (14)</summary>
 
 <blockquote>
 
@@ -1457,6 +1457,14 @@
 Добавляет анимации от первого лица модели игрока от третьего лица.
 
 [![Modrinth](https://img.shields.io/badge/Modrinth-1bd96a?logo=modrinth&logoColor=white)](https://modrinth.com/mod/not-enough-animations) [![CurseForge](https://img.shields.io/badge/CurseForge-f16436?logo=curseforge&logoColor=white)](https://www.curseforge.com/projects/433760) [![GitHub](https://img.shields.io/badge/GitHub-24292e?logo=github&logoColor=white)](https://github.com/tr7zw/NotEnoughAnimations) [📄 карточка](mods/notenoughanimations.md)
+
+</details>
+<details>
+<summary><b>Reese&#39;s Sodium Options</b> · <code>2.2.4</code></summary>
+
+Удобное меню видеонастроек для Sodium: вкладки, поиск и прокрутка вместо одной длинной страницы.
+
+[![Modrinth](https://img.shields.io/badge/Modrinth-1bd96a?logo=modrinth&logoColor=white)](https://modrinth.com/mod/reeses-sodium-options) [![GitHub](https://img.shields.io/badge/GitHub-24292e?logo=github&logoColor=white)](https://github.com/FlashyReese/reeses-sodium-options) [📄 карточка](mods/reeses_sodium_options.md)
 
 </details>
 <details>
@@ -1549,7 +1557,7 @@
 
 <a id="performance"></a>
 <details>
-<summary><b>🚀 Оптимизация и исправления</b> (23)</summary>
+<summary><b>🚀 Оптимизация и исправления</b> (22)</summary>
 
 <blockquote>
 
@@ -1679,14 +1687,6 @@
 Ускоряет запуск, снижает потребление памяти и исправляет множество ошибок.
 
 [![Modrinth](https://img.shields.io/badge/Modrinth-1bd96a?logo=modrinth&logoColor=white)](https://modrinth.com/mod/modernfix) [![CurseForge](https://img.shields.io/badge/CurseForge-f16436?logo=curseforge&logoColor=white)](https://www.curseforge.com/projects/790626) [![GitHub](https://img.shields.io/badge/GitHub-24292e?logo=github&logoColor=white)](https://github.com/embeddedt/ModernFix) [📄 карточка](mods/modernfix.md)
-
-</details>
-<details>
-<summary><b>Moonrise</b> · <code>0.1.0-beta.15+2eae1b1</code></summary>
-
-Оптимизация сервера: чанки, освещение, сущности.
-
-[![Modrinth](https://img.shields.io/badge/Modrinth-1bd96a?logo=modrinth&logoColor=white)](https://modrinth.com/mod/moonrise-opt) [![GitHub](https://img.shields.io/badge/GitHub-24292e?logo=github&logoColor=white)](https://github.com/Tuinity/Moonrise) [📄 карточка](mods/moonrise.md)
 
 </details>
 <details>
@@ -1867,7 +1867,7 @@
 
 <a id="libraries"></a>
 <details>
-<summary><b>📚 Библиотеки и API</b> (50)</summary>
+<summary><b>📚 Библиотеки и API</b> (51)</summary>
 
 <blockquote>
 
@@ -1984,6 +1984,14 @@
 
 </details>
 <details>
+<summary><b>FLIB</b> · <code>0.2.9</code></summary>
+
+Общая библиотека модов Lothrazar (нужна Creeper Heal).
+
+[![Modrinth](https://img.shields.io/badge/Modrinth-1bd96a?logo=modrinth&logoColor=white)](https://modrinth.com/mod/flib) [📄 карточка](mods/flib.md)
+
+</details>
+<details>
 <summary><b>ForgeEndertech</b> · <code>12.1.4.0</code></summary>
 
 Библиотека для модов Endertech; сама ничего не добавляет.
@@ -2061,6 +2069,14 @@ Fabric API поверх NeoForge — нужен для запуска Fabric-м�
 Библиотека для модов Invoker54; сама ничего не добавляет.
 
 [![Modrinth](https://img.shields.io/badge/Modrinth-1bd96a?logo=modrinth&logoColor=white)](https://modrinth.com/mod/invocore-utility-mod) [![CurseForge](https://img.shields.io/badge/CurseForge-f16436?logo=curseforge&logoColor=white)](https://www.curseforge.com/projects/693881) [![GitHub](https://img.shields.io/badge/GitHub-24292e?logo=github&logoColor=white)](https://github.com/Cycro54/Invocore) [📄 карточка](mods/invocore.md)
+
+</details>
+<details>
+<summary><b>Iron&#39;s Lib</b> · <code>2.2.0</code></summary>
+
+Общая библиотека модов iron431 (нужна Iron's Spells 'n Spellbooks).
+
+[![Modrinth](https://img.shields.io/badge/Modrinth-1bd96a?logo=modrinth&logoColor=white)](https://modrinth.com/mod/irons-lib) [📄 карточка](mods/irons_lib.md)
 
 </details>
 <details>
@@ -2216,14 +2232,6 @@ Fabric API поверх NeoForge — нужен для запуска Fabric-м�
 
 </details>
 <details>
-<summary><b>Sodium Options API</b> · <code>1.0.10</code></summary>
-
-Библиотека для меню настроек Sodium.
-
-[![Modrinth](https://img.shields.io/badge/Modrinth-1bd96a?logo=modrinth&logoColor=white)](https://modrinth.com/mod/sodium-options-api) [![CurseForge](https://img.shields.io/badge/CurseForge-f16436?logo=curseforge&logoColor=white)](https://www.curseforge.com/projects/1103431) [![GitHub](https://img.shields.io/badge/GitHub-24292e?logo=github&logoColor=white)](https://github.com/txnimc/SodiumOptionsAPI) [📄 карточка](mods/sodiumoptionsapi.md)
-
-</details>
-<details>
 <summary><b>Sophisticated Core</b> · <code>1.5.12</code></summary>
 
 Библиотека для модов Sophisticated.
@@ -2278,7 +2286,7 @@ Fabric API поверх NeoForge — нужен для запуска Fabric-м�
 
 <a id="misc"></a>
 <details>
-<summary><b>📦 Прочее</b> (40)</summary>
+<summary><b>📦 Прочее</b> (39)</summary>
 
 <blockquote>
 
@@ -2432,14 +2440,6 @@ API для полёта на элитрах; нужен другим модам 
 Делает спавнеры сложнее: их нужно разрушить или зачистить, а мобы появляются активнее.
 
 [![CurseForge](https://img.shields.io/badge/CurseForge-f16436?logo=curseforge&logoColor=white)](https://www.curseforge.com/projects/399413) [![GitHub](https://img.shields.io/badge/GitHub-24292e?logo=github&logoColor=white)](https://github.com/mactso/HarderSpawners) [📄 карточка](mods/harderspawners.md)
-
-</details>
-<details>
-<summary><b>IDKFINDAIDEA</b> · <code>1.0.0</code></summary>
-
-Небольшой служебный мод без описания; назначение в игре неясно.
-
-[![CurseForge](https://img.shields.io/badge/CurseForge-f16436?logo=curseforge&logoColor=white)](https://www.curseforge.com/projects/1683922) [📄 карточка](mods/idkfindaidea.md)
 
 </details>
 <details>
@@ -2609,4 +2609,4 @@ JavaScript-движок для KubeJS.
 
 ---
 
-<sub>Сгенерировано скриптом <code>Update mods.ps1</code> · 2026-10-18. Правьте карточки в <code>mods/</code>, а не этот файл. Поиск и фильтр — на странице сборки <a href="../Z%40RYA.html#mods">Z@RYA.html</a>.</sub>
+<sub>Сгенерировано скриптом <code>Update mods.ps1</code> · 2026-10-19. Правьте карточки в <code>mods/</code>, а не этот файл. Поиск и фильтр — на странице сборки <a href="Z%40RYA.html#mods">Z@RYA.html</a>.</sub>

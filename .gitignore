@@ -1,9 +1,3 @@
-# Z@RYA Deep Dark Fantasies (1.21.1) — что попадает в git / GitHub Pages.
-# Отслеживаются текстовые исходники: README.md, Z@RYA.html, index.html, instance.cfg, mmc-pack.json,
-# _Helpful Stuff (скрипты, MD-списки, карточки модов и ресурспаков), minecraft/kubejs, minecraft/config,
-# minecraft/defaultconfigs, свои ресурспаки-папки и списки MODLIST/RESOURCEPACKLIST/MUSICLIST.md.
-# Бинарники (моды, архивы, музыка, кадры анимации) и рантайм игры/лаунчера — не отслеживаются.
-
 # --- бинарники сборки (берите с архива релиза) ---
 *.jar
 *.jar.disabled

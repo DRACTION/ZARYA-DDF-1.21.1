@@ -134,7 +134,7 @@ $onCount = @($rpList | Where-Object { $_.on }).Count
 $sb = New-Object Text.StringBuilder
 [void]$sb.Append("# Z@RYA Deep Dark Fantasies — ресурспаки`n`n")
 [void]$sb.Append("**Ресурспаков: $($rpList.Count)**$(if ($gameOrder) { " (включено: $onCount)" } else { '' }) · Minecraft $($pi.mc)$(if ($repoUrl) { " · [$repoLabel]($repoUrl)" } else { '' })`n`n")
-[void]$sb.Append("> Поиск — на странице сборки [Z@RYA.html](../Z%40RYA.html#packs) (скачайте и откройте в браузере, работает без интернета).`n")
+[void]$sb.Append("> Поиск, порядок и карточки — на $(Site-Links 'packs').`n")
 if ($gameOrder) { [void]$sb.Append("> Порядок как в игре (``options.txt``): сначала включённые — «Вкл 1» вверху списка «Выбранные» (высший приоритет), затем выключенные по алфавиту.`n`n") }
 else { [void]$sb.Append("> По алфавиту — ``options.txt`` ещё нет (порядок из игры появится после первого запуска).`n`n") }
 [void]$sb.Append("## Список`n`n| № | Ресурспак | Версия |$(if ($gameOrder) { ' Статус |' } else { '' })`n|--:|---|---|$(if ($gameOrder) { '---|' } else { '' })`n")
@@ -167,7 +167,7 @@ foreach ($g in $groupsRp) {
   }
   [void]$sb.Append("`n</blockquote>`n`n</details>`n`n")
 }
-[void]$sb.Append("---`n`n<sub>Сгенерировано скриптом <code>Update resourcepacks.ps1</code> · $(Get-Date -Format 'yyyy-MM-dd'). Правьте карточки в <code>resourcepacks/</code>, а не этот файл. Поиск — на странице сборки <a href=`"../Z%40RYA.html#packs`">Z@RYA.html</a>.</sub>`n")
+[void]$sb.Append("---`n`n<sub>Сгенерировано скриптом <code>Update resourcepacks.ps1</code> · $(Get-Date -Format 'yyyy-MM-dd'). Правьте карточки в <code>resourcepacks/</code>, а не этот файл. Поиск — на странице сборки <a href=`"Z%40RYA.html#packs`">Z@RYA.html</a>.</sub>`n")
 $rpMd = Join-Path $PSScriptRoot 'RESOURCEPACKS.md'
 [IO.File]::WriteAllText($rpMd, $sb.ToString(), $enc)
 Write-Host "Обновлён: $rpMd"

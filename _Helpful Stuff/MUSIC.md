@@ -2,7 +2,7 @@
 
 **Треков: 134** · 8 ч 34 мин · Minecraft 1.21.1 · Music Triggers · [GitHub](https://github.com/DRACTION/ZARYA-DDF-1.21.1)
 
-> Поиск и фильтр по событиям — на странице сборки [Z@RYA.html](../Z%40RYA.html#music) (скачайте и откройте в браузере, работает без интернета).
+> Поиск и фильтр по событиям — на [странице сборки](https://draction.github.io/ZARYA-DDF-1.21.1/#music) [(версия без интернета)](Z%40RYA.html#music).
 > Треки — `minecraft/config/MusicTriggers/songs`, события — `config/MusicTriggers/general/main.toml`. Если у трека несколько событий, он играет, только когда выполняются все сразу.
 
 ## События
@@ -1329,4 +1329,4 @@
 
 ---
 
-<sub>Сгенерировано скриптом <code>Update music.ps1</code> · 2026-10-18. Длительность посчитана по самим файлам. Поиск и фильтр — на странице сборки <a href="../Z%40RYA.html#music">Z@RYA.html</a>.</sub>
+<sub>Сгенерировано скриптом <code>Update music.ps1</code> · 2026-10-18. Длительность посчитана по самим файлам. Поиск и фильтр — на странице сборки <a href="Z%40RYA.html#music">Z@RYA.html</a>.</sub>

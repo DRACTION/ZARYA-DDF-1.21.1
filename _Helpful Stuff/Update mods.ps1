@@ -195,7 +195,7 @@ $packInfo = Get-PackInfo $root; $mcVer = $packInfo.mc; $neoVer = $packInfo.neo
 $sb = New-Object Text.StringBuilder
 [void]$sb.Append("# Z@RYA Deep Dark Fantasies — моды`n`n")
 [void]$sb.Append("**Модов: $($items.Count)** · Minecraft $mcVer · NeoForge $(if ($neoVer) { $neoVer } else { '—' })$(if ($repoUrl) { " · [$repoLabel]($repoUrl)" } else { '' })`n`n")
-[void]$sb.Append("> Поиск, фильтр по категориям и сортировка — на странице сборки [Z@RYA.html](../Z%40RYA.html#mods) (скачайте и откройте в браузере, работает без интернета).`n`n")
+[void]$sb.Append("> Поиск, фильтр по категориям и сортировка — на $(Site-Links 'mods').`n`n")
 [void]$sb.Append("## Категории`n`n| | Категория | Модов |`n|:-:|---|--:|`n")
 $groups = @{}
 foreach ($cat in $catOrder) {
@@ -219,7 +219,7 @@ foreach ($cat in $catOrder) {
   }
   [void]$sb.Append("`n</blockquote>`n`n</details>`n`n")
 }
-[void]$sb.Append("---`n`n<sub>Сгенерировано скриптом <code>Update mods.ps1</code> · $(Get-Date -Format 'yyyy-MM-dd'). Правьте карточки в <code>mods/</code>, а не этот файл. Поиск и фильтр — на странице сборки <a href=`"../Z%40RYA.html#mods`">Z@RYA.html</a>.</sub>`n")
+[void]$sb.Append("---`n`n<sub>Сгенерировано скриптом <code>Update mods.ps1</code> · $(Get-Date -Format 'yyyy-MM-dd'). Правьте карточки в <code>mods/</code>, а не этот файл. Поиск и фильтр — на странице сборки <a href=`"Z%40RYA.html#mods`">Z@RYA.html</a>.</sub>`n")
 [IO.File]::WriteAllText($modsMdPath, $sb.ToString(), $enc)
 
 $stale = (Get-Cards | Where-Object { $used[$_.BaseName] -ne 1 }).Name

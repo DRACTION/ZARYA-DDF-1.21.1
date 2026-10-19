@@ -4,7 +4,8 @@
 #    Источники: instance.cfg и mmc-pack.json (Get-PackInfo), minecraft\mods.
 #    Меняются только строки-поля внутри рамки; ширина и выравнивание сохраняются; файл пишется, только если что-то изменилось.
 #    Кодировка (BOM или без) и переводы строк (CRLF/LF) сохраняются.
-# 2) Z@RYA.html в корне инстанса: один офлайн-файл (без внешних CSS/JS/шрифтов) + index.html с переадресацией на неё (GitHub Pages).
+# 2) _Helpful Stuff\Z@RYA.html: один офлайн-файл (без внешних CSS/JS/шрифтов) + index.html в корне инстанса с переадресацией на неё
+#    (GitHub Pages; в корне нужен пустой .nojekyll — иначе Jekyll не публикует папки, начинающиеся с «_»; скрипт создаёт его сам).
 #    Вкладки: Главная / Установка / Помощь (тексты из README.md), Моды (карточки mods/*.md), Ресурспаки, Музыка.
 # Вызывается из Update mods.ps1, Update resourcepacks.ps1, Update music.ps1; можно запускать отдельно.
 # -NoReadme — не трогать README.md; -NoSite — не собирать Z@RYA.html/index.html; -OutFile — собрать страницу в другой файл (без index.html).
@@ -81,7 +82,7 @@ if ($NoSite) { return }
 # ================= 2. Страница сборки Z@RYA.html =================
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $enc = New-Object Text.UTF8Encoding($false)
-$outPath = if ($OutFile) { $OutFile } else { Join-Path $root 'Z@RYA.html' }
+$outPath = if ($OutFile) { $OutFile } else { Join-Path $root '_Helpful Stuff\Z@RYA.html' }
 $cardsDir = Join-Path $PSScriptRoot 'mods'
 $modsDir = Join-Path $root 'minecraft\mods'
 $rpCardsDir = Join-Path $PSScriptRoot 'resourcepacks'
@@ -123,6 +124,9 @@ function Resize-Image([byte[]]$b, [int]$size) {
 $pi = Get-PackInfo $root
 $repoUrl = Get-RepoUrl $root
 $pack = [ordered]@{ name = 'Z@RYA Deep Dark Fantasies'; version = $pi.version; mc = $pi.mc; neo = $pi.neo; repo = $repoUrl; repoLabel = (Get-RepoLabel $repoUrl); date = (Get-Date -Format 'yyyy-MM-dd HH:mm') }
+# Путь от страницы к корню инстанса (для относительных ссылок README): _Helpful Stuff\Z@RYA.html -> '../'
+$siteDir = Split-Path -Parent ([IO.Path]::GetFullPath($outPath)); $rootDir = [IO.Path]::GetFullPath($root).TrimEnd('\')
+$pack['base'] = if ($siteDir.TrimEnd('\') -ieq $rootDir) { '' } else { (New-Object Uri(($siteDir.TrimEnd('\') + '\'))).MakeRelativeUri((New-Object Uri($rootDir + '\'))).ToString() }
 
 # --- README: ASCII-шапка отдельно, комментарии (<!-- TODO … -->) вырезаются ---
 $readme = ''; $header = ''
@@ -134,7 +138,8 @@ if (Test-Path -LiteralPath $readmePath) {
   $readme = $readme -replace '(?s)<!--.*?-->', ''
   # Раздел со ссылками на списки — на странице не нужен (всё есть во вкладках); README.md не меняется
   $readme = $readme -replace '(?ms)^##[ \t]+Список модификаций и прочее[ \t]*\n.*?(?=^#{1,2}[ \t]|\z)', ''
-  $readme = (($readme -split '\n') | Where-Object { $_ -notmatch '^\s*(TODO|ToDo)\b' } | ForEach-Object { $_.TrimEnd() }) -join "`n"
+  # Ссылка README → HTML-версия (GitHub Pages) на самой странице не нужна
+  $readme = (($readme -split '\n') | Where-Object { $_ -notmatch '^\s*(TODO|ToDo)\b' -and $_ -notmatch '^\s*>.*\]\(https?://[^)]*\.github\.io/' } | ForEach-Object { $_.TrimEnd() }) -join "`n"
   $readme = $readme.Trim()
 }
 
@@ -639,10 +644,11 @@ function slug(t){return String(t).toLowerCase().replace(/<[^>]*>/g,'').replace(/
 function href(u){
   var m;
   if(/^#/.test(u))return {h:u};
-  if((m=u.match(/^(?:\.\/)?Z(?:%40|@)RYA\.html(#.*)?$/i)))return {h:m[1]||'#home'};
+  if((m=u.match(/^(?:\.\.?\/)?(?:_Helpful(?:%20| )Stuff\/)?Z(?:%40|@)RYA\.html(#.*)?$/i)))return {h:m[1]||'#home'};
   if(/^(https?:|mailto:)/i.test(u))return {h:u,ext:1};
   if(/^[a-z][a-z0-9+.-]*:/i.test(u))return null;
-  return {h:u,ext:1};
+  /* относительные ссылки README — от корня инстанса; страница лежит в P.base от него */
+  return {h:(/^\//.test(u)?'':(P.base||''))+u,ext:1};
 }
 function fmt(t){
   t=esc(t);
@@ -1323,9 +1329,10 @@ if ($music.missing.Count) { Write-Host "В main.toml треки без файл�
 
 # --- index.html в корне: переадресация на Z@RYA.html (для GitHub Pages: https://<user>.github.io/<repo>/), #вкладка сохраняется ---
 if (-not $OutFile) {
-  $leaf = Split-Path -Leaf $outPath
-  $target = [uri]::EscapeDataString($leaf)   # Z@RYA.html -> Z%40RYA.html
-  $tE = [Net.WebUtility]::HtmlEncode($title); $lE = [Net.WebUtility]::HtmlEncode($leaf)
+  $outFull = [IO.Path]::GetFullPath($outPath); $rootFull = [IO.Path]::GetFullPath($root).TrimEnd('\')
+  $leaf = if ($outFull.StartsWith($rootFull + '\', [StringComparison]::OrdinalIgnoreCase)) { $outFull.Substring($rootFull.Length + 1) } else { Split-Path -Leaf $outPath }
+  $target = Url-Path $leaf   # _Helpful Stuff\Z@RYA.html -> _Helpful%20Stuff/Z%40RYA.html
+  $tE = [Net.WebUtility]::HtmlEncode($title); $lE = [Net.WebUtility]::HtmlEncode(($leaf -replace '\\', '/'))
   $idx = @"
 <!DOCTYPE html>
 <html lang="ru">
@@ -1347,7 +1354,10 @@ if (-not $OutFile) {
 </html>
 
 "@ -replace "`r`n", "`n"
-  $idxPath = Join-Path (Split-Path -Parent $outPath) 'index.html'
+  $idxPath = Join-Path $root 'index.html'
   $old = if (Test-Path -LiteralPath $idxPath) { [IO.File]::ReadAllText($idxPath, $enc) } else { $null }
   if ($old -cne $idx) { [IO.File]::WriteAllText($idxPath, $idx, $enc); Write-Host "index.html -> $target" }
+  # GitHub Pages: без .nojekyll Jekyll пропускает папки на «_», и _Helpful Stuff/Z@RYA.html не опубликуется
+  $nj = Join-Path $root '.nojekyll'
+  if (-not (Test-Path -LiteralPath $nj)) { [IO.File]::WriteAllBytes($nj, [byte[]]@()); Write-Host '.nojekyll создан (нужен для GitHub Pages)' }
 }

@@ -60,7 +60,7 @@ $total = Sum-Dur $tracks
 $sb = New-Object Text.StringBuilder
 [void]$sb.Append("# Z@RYA Deep Dark Fantasies — музыка`n`n")
 [void]$sb.Append("**Треков: $($tracks.Count)** · $(Format-Hms $total) · Minecraft $($pi.mc) · Music Triggers$(if ($repoUrl) { " · [$repoLabel]($repoUrl)" } else { '' })`n`n")
-[void]$sb.Append("> Поиск и фильтр по событиям — на странице сборки [Z@RYA.html](../Z%40RYA.html#music) (скачайте и откройте в браузере, работает без интернета).`n")
+[void]$sb.Append("> Поиск и фильтр по событиям — на $(Site-Links 'music').`n")
 [void]$sb.Append("> Треки — ``minecraft/config/MusicTriggers/songs``, события — ``config/MusicTriggers/general/main.toml``. Если у трека несколько событий, он играет, только когда выполняются все сразу.`n`n")
 [void]$sb.Append("## События`n`n| | События | Треков | Длительность |`n|:-:|---|--:|--:|`n")
 foreach ($g in $glist) { [void]$sb.Append("| $(G-Icon $g) | [$((G-Title $g) -replace '\|', '\|')](#$(G-Id $g)) | $($g.items.Count) | $(Format-Hms (Sum-Dur $g.items)) |`n") }
@@ -110,7 +110,7 @@ if ($M.parsed -and $trigs.Count) {
   [void]$sb.Append("По документации и исходникам Music Triggers 7.0.4. Время указывается в тиках: 20 тиков = 1 секунда.`n`n")
   [void]$sb.Append("$(P-Legend $ordK)`n`n**Параметры треков** (<code>[songs.*]</code>):`n`n$(P-Legend $usedS)`n`n</details>`n`n</blockquote>`n`n</details>`n`n")
 }
-[void]$sb.Append("---`n`n<sub>Сгенерировано скриптом <code>Update music.ps1</code> · $(Get-Date -Format 'yyyy-MM-dd'). Длительность посчитана по самим файлам. Поиск и фильтр — на странице сборки <a href=`"../Z%40RYA.html#music`">Z@RYA.html</a>.</sub>`n")
+[void]$sb.Append("---`n`n<sub>Сгенерировано скриптом <code>Update music.ps1</code> · $(Get-Date -Format 'yyyy-MM-dd'). Длительность посчитана по самим файлам. Поиск и фильтр — на странице сборки <a href=`"Z%40RYA.html#music`">Z@RYA.html</a>.</sub>`n")
 $musicMd = Join-Path $PSScriptRoot 'MUSIC.md'
 [IO.File]::WriteAllText($musicMd, $sb.ToString(), $enc)
 Write-Host "Обновлён: $musicMd (треков: $($tracks.Count), групп: $($glist.Count), $(Format-Hms $total))"
