@@ -133,13 +133,14 @@ $readme = ''; $header = ''
 $readmePath = Join-Path $root 'README.md'
 if (Test-Path -LiteralPath $readmePath) {
   $readme = [IO.File]::ReadAllText($readmePath, $enc) -replace '\r', ''
+  # Всё, что в README.md выше <!-- ZARYA-HEADER:BEGIN --> (ссылка на сайт, заметки для GitHub), на странице не показывается
+  $hb = $readme.IndexOf('<!-- ZARYA-HEADER:BEGIN -->'); if ($hb -gt 0) { $readme = $readme.Substring($hb) }
   $hm = [regex]::Match($readme, '(?s)```text\n(.*?)\n```')
   if ($hm.Success) { $header = [Net.WebUtility]::HtmlEncode($hm.Groups[1].Value); $readme = $readme.Remove($hm.Index, $hm.Length) }
   $readme = $readme -replace '(?s)<!--.*?-->', ''
   # Раздел со ссылками на списки — на странице не нужен (всё есть во вкладках); README.md не меняется
   $readme = $readme -replace '(?ms)^##[ \t]+Список модификаций и прочее[ \t]*\n.*?(?=^#{1,2}[ \t]|\z)', ''
-  # Ссылка README → HTML-версия (GitHub Pages) на самой странице не нужна
-  $readme = (($readme -split '\n') | Where-Object { $_ -notmatch '^\s*(TODO|ToDo)\b' -and $_ -notmatch '^\s*>.*\]\(https?://[^)]*\.github\.io/' } | ForEach-Object { $_.TrimEnd() }) -join "`n"
+  $readme = (($readme -split '\n') | Where-Object { $_ -notmatch '^\s*(TODO|ToDo)\b' } | ForEach-Object { $_.TrimEnd() }) -join "`n"
   $readme = $readme.Trim()
 }
 
@@ -182,7 +183,29 @@ $music = Get-MusicData $root
 
 # --- Сборка страницы ---
 $data = [ordered]@{ pack = $pack; cats = $cats; mods = $mods; packs = $packs; packsOrder = $packsOrder; music = $music; readme = $readme }
-$json = ConvertTo-Json -InputObject $data -Compress -Depth 8
+# JSON для git-diff: верхний уровень с отступами, массивы записей — по записи (компактный объект) на строку.
+# ConvertTo-Json -Compress сериализует каждый фрагмент (порядок ключей [ordered] сохраняется, кириллица остаётся UTF-8).
+function Json-Lines($v, [string]$ind = '', [int]$width = 120) {
+  if ($null -eq $v) { return 'null' }
+  $c = ConvertTo-Json -InputObject $v -Compress -Depth 8
+  if ($c.Length -le $width -or $v -is [string] -or $v -is [ValueType]) { return $c }
+  $in = $ind + '  '
+  if ($v -is [Collections.IDictionary] -or $v -is [Management.Automation.PSCustomObject]) {
+    $keys = if ($v -is [Collections.IDictionary]) { @($v.Keys) } else { @($v.PSObject.Properties | ForEach-Object { $_.Name }) }
+    if (-not $keys.Count) { return $c }
+    $isDict = $v -is [Collections.IDictionary]
+    # без $(...)/if-выражений: они разворачивают массивы из одного элемента
+    $parts = foreach ($k in $keys) { if ($isDict) { $val = $v[$k] } else { $val = $v.$k }; $in + (ConvertTo-Json -InputObject ([string]$k) -Compress) + ': ' + (Json-Lines $val $in $width) }
+    return "{`n" + ($parts -join ",`n") + "`n$ind}"
+  }
+  if ($v -is [Collections.IEnumerable]) {
+    $parts = foreach ($x in $v) { $in + $(if ($null -eq $x) { 'null' } else { ConvertTo-Json -InputObject $x -Compress -Depth 8 }) }
+    if (-not @($parts).Count) { return $c }
+    return "[`n" + (@($parts) -join ",`n") + "`n$ind]"
+  }
+  return $c
+}
+$json = "`n" + (Json-Lines $data) + "`n"
 $json = $json -replace '<', '\u003c' -replace '>', '\u003e' -replace '&', '\u0026'
 $title = "Z@RYA Deep Dark Fantasies$(if ($pi.version) { " $($pi.version)" }) — страница сборки"
 $brandIcon = if ($brandSrc) { "<img src=`"$brandSrc`" alt=`"`">" } else { '' }
